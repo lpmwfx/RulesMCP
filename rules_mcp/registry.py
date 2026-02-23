@@ -53,72 +53,44 @@ class Registry:
         languages: list[str],
         phase: int | None = None,
     ) -> list[list[dict]]:
-        """Return entries in topological layers for given languages.
+        """Return entries grouped by curated layer for given languages.
 
-        Layers are ordered: foundational first, dependent later.
-        Uses referenced-by count to rank importance.
+        Uses the 'layer' field from register.jsonl (1-6):
+          1: Global foundations
+          2: Project methodology
+          3: Language core (types, structure, errors, naming)
+          4: Language advanced (testing, tooling, platform)
+          5: Infrastructure (automation, devops, ipc, platform-ux)
+          6: Reference (READMEs, quick-refs)
+
+        Only includes layers relevant to requested languages.
         If phase is given (1-based), return only that layer.
         """
         lang_set = {lang.lower() for lang in languages}
-        # Always include global and project-files as foundational
+        # Always include global + project-files as foundation
         include_cats = lang_set | {"global", "project-files"}
-        by_file = {e["file"]: e for e in self.entries}
 
-        # Collect relevant files
-        relevant: set[str] = set()
+        # Collect relevant entries
+        relevant: list[dict] = []
         for e in self.entries:
             cat = e.get("category", "").lower()
             if cat in include_cats:
-                relevant.add(e["file"])
+                relevant.append(e)
 
-        # Count how many relevant files reference each file
-        referenced_by: dict[str, int] = {f: 0 for f in relevant}
-        for f in relevant:
-            entry = by_file[f]
-            cat = f.split("/")[0] if "/" in f else ""
-            for ref in entry.get("refs", []):
-                full_ref = f"{cat}/{ref}" if "/" not in ref else ref
-                if full_ref in relevant:
-                    referenced_by[full_ref] = referenced_by.get(full_ref, 0) + 1
-
-        # Score: referenced_by count + bonus for rules/banned markers
-        scores: dict[str, int] = {}
-        for f in relevant:
-            entry = by_file[f]
-            ref_score = referenced_by.get(f, 0)
-            rule_count = len(entry.get("rules", []))
-            banned_count = len(entry.get("banned", []))
-            has_examples = 1 if entry.get("has_examples") else 0
-            scores[f] = ref_score * 3 + rule_count + banned_count + has_examples
-
-        # Sort by score descending, split into layers
-        sorted_files = sorted(relevant, key=lambda f: scores.get(f, 0), reverse=True)
-        if not sorted_files:
+        if not relevant:
             return []
 
-        max_score = scores[sorted_files[0]]
-        layers: list[list[dict]] = [[], [], [], []]
-        for f in sorted_files:
-            s = scores.get(f, 0)
-            entry = by_file.get(f)
-            if entry is None:
-                continue
-            ratio = s / max_score if max_score > 0 else 0
-            if ratio >= 0.6:
-                layers[0].append(entry)
-            elif ratio >= 0.3:
-                layers[1].append(entry)
-            elif ratio > 0:
-                layers[2].append(entry)
-            else:
-                layers[3].append(entry)
+        # Group by layer field (default layer 4 for entries without it)
+        layer_groups: dict[int, list[dict]] = {}
+        for e in relevant:
+            layer = e.get("layer", 4)
+            layer_groups.setdefault(layer, []).append(e)
 
-        # Remove empty layers, sort within each layer
-        layers = [
-            sorted(layer, key=lambda e: e.get("file", ""))
-            for layer in layers
-            if layer
-        ]
+        # Build sorted layers (ascending layer number)
+        layers: list[list[dict]] = []
+        for layer_num in sorted(layer_groups):
+            entries = sorted(layer_groups[layer_num], key=lambda e: e.get("file", ""))
+            layers.append(entries)
 
         if phase is not None and 1 <= phase <= len(layers):
             return [layers[phase - 1]]
