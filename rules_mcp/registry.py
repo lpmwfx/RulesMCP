@@ -97,28 +97,40 @@ class Registry:
         return layers
 
 
+def _matches(token: str, field: str) -> bool:
+    """Bidirectional substring match."""
+    return token in field or field in token
+
+
 def _score_entry(entry: dict, tokens: list[str]) -> int:
-    """Score an entry by how many tokens match searchable fields."""
-    searchable = _build_searchable(entry)
+    """Score entry with weighted fields and bidirectional matching."""
+    fields = _build_weighted_fields(entry)
     score = 0
     for token in tokens:
-        for field_text in searchable:
-            if token in field_text:
-                score += 1
-                break
+        for field_text, weight in fields:
+            if _matches(token, field_text):
+                score += weight
     return score
 
 
-def _build_searchable(entry: dict) -> list[str]:
-    """Build lowercase searchable strings from entry fields."""
-    parts: list[str] = []
-    parts.append(entry.get("title", "").lower())
-    parts.append(entry.get("subtitle", "").lower())
+def _build_weighted_fields(entry: dict) -> list[tuple[str, int]]:
+    """Build (text, weight) pairs from entry fields."""
+    fields: list[tuple[str, int]] = []
+    # File path (weight 3) — matches "types" in "python/types.md"
+    fields.append((entry.get("file", "").lower(), 3))
+    # Title (weight 3)
+    fields.append((entry.get("title", "").lower(), 3))
+    # Subtitle (weight 1)
+    fields.append((entry.get("subtitle", "").lower(), 1))
+    # Tags (weight 2 each)
     for tag in entry.get("tags", []):
-        parts.append(tag.lower())
+        fields.append((tag.lower(), 2))
+    # Concepts (weight 2 each)
     for concept in entry.get("concepts", []):
-        parts.append(concept.lower())
+        fields.append((concept.lower(), 2))
+    # Keywords (weight 1 each)
     for kw in entry.get("keywords", []):
-        parts.append(kw.lower())
-    parts.append(entry.get("category", "").lower())
-    return parts
+        fields.append((kw.lower(), 1))
+    # Category (weight 1)
+    fields.append((entry.get("category", "").lower(), 1))
+    return fields
