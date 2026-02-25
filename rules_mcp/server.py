@@ -52,6 +52,7 @@ def help() -> str:
 | `get_context(languages)` | All rules for languages | `get_context(["python", "js"])` |
 | `get_learning_path(languages)` | Phased reading order | `get_learning_path(["cpp"], phase=1)` |
 | `list_rules(category)` | Browse available rules | `list_rules("rust")` |
+| `get_related(file)` | Follow edges to related rules | `get_related("python/types.md")` |
 
 ## Quick start
 
@@ -199,6 +200,48 @@ def get_learning_path(
         f"# Learning Path: {', '.join(languages)} — {total} rules in {total_phases} phases\n",
     )
     return "\n".join(sections)
+
+
+@mcp.tool()
+def get_related(file: str) -> str:
+    """Get related rules by following graph edges from a specific rule file.
+
+    Shows requires, required_by, feeds, fed_by, and related edges.
+
+    Args:
+        file: Path relative to repo root (e.g. "python/types.md")
+    """
+    _ensure_loaded()
+    entry = _registry.find_by_file(file)
+    if not entry:
+        return f"File not found: {file}"
+
+    edges = entry.get("edges", {})
+    if not any(edges.get(k, []) for k in ("requires", "required_by", "feeds", "fed_by", "related")):
+        return f"No edges found for {file}"
+
+    lines: list[str] = [f"# Edges for {file}\n"]
+
+    labels = {
+        "requires": "Depends on (must read first)",
+        "required_by": "Depended on by",
+        "feeds": "Feeds into",
+        "fed_by": "Fed by",
+        "related": "Related",
+    }
+
+    for edge_type, label in labels.items():
+        targets = edges.get(edge_type, [])
+        if not targets:
+            continue
+        lines.append(f"## {label}")
+        for target in targets:
+            target_entry = _registry.find_by_file(target)
+            title = target_entry.get("title", "") if target_entry else "(not found)"
+            lines.append(f"- {target}: {title}")
+        lines.append("")
+
+    return "\n".join(lines)
 
 
 @mcp.tool()

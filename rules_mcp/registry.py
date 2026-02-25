@@ -48,6 +48,13 @@ class Registry:
         """Return unique categories."""
         return sorted({e.get("category", "") for e in self.entries})
 
+    def find_by_file(self, file: str) -> dict | None:
+        """Find a single entry by its file path."""
+        for entry in self.entries:
+            if entry.get("file") == file:
+                return entry
+        return None
+
     def learning_path(
         self,
         languages: list[str],
