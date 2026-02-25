@@ -9,7 +9,7 @@ from rules_mcp.repo import ensure_repo
 
 mcp = FastMCP(
     "rules",
-    instructions="AI coding rules lookup — Python, JS, CSS, C++, Rust, Kotlin standards",
+    instructions="AI coding rules lookup — Python, JS, CSS, C++, Rust, Kotlin standards. Call help() to get started.",
 )
 
 _registry = Registry()
@@ -23,6 +23,46 @@ def _ensure_loaded() -> Path:
         _repo_path = ensure_repo()
         _registry.load(_repo_path)
     return _repo_path
+
+
+@mcp.tool()
+def help() -> str:
+    """Get started with the Rules MCP server. Shows available tools, categories, and quick start examples."""
+    _ensure_loaded()
+
+    # Dynamic stats
+    total_rules = len(_registry.entries)
+    cats = _registry.categories()
+    rule_count = sum(len(e.get("rules", [])) for e in _registry.entries)
+    banned_count = sum(len(e.get("banned", [])) for e in _registry.entries)
+
+    cat_list = ", ".join(cats)
+
+    return f"""# Rules MCP — AI coding standards lookup
+
+**{total_rules} rules** across **{len(cats)} categories** ({rule_count} RULE markers, {banned_count} BANNED markers)
+
+## Tools
+
+| Tool | Purpose | Example |
+|------|---------|---------|
+| `help()` | This overview | — |
+| `search_rules(query)` | Find rules by keyword | `search_rules("testing")` |
+| `get_rule(file)` | Read full rule content | `get_rule("python/types.md")` |
+| `get_context(languages)` | All rules for languages | `get_context(["python", "js"])` |
+| `get_learning_path(languages)` | Phased reading order | `get_learning_path(["cpp"], phase=1)` |
+| `list_rules(category)` | Browse available rules | `list_rules("rust")` |
+
+## Quick start
+
+- **New project setup** → `get_context(["project-files"])`
+- **Learn a language's rules** → `get_learning_path(["python"], phase=1)`
+- **Search a topic** → `search_rules("error handling")`
+- **Browse everything** → `list_rules()`
+
+## Categories
+
+{cat_list}"""
 
 
 @mcp.tool()
