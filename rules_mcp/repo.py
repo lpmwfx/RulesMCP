@@ -3,9 +3,10 @@ from __future__ import annotations
 from pathlib import Path
 
 from git import Repo
+from platformdirs import user_cache_dir
 
 REPO_URL = "https://github.com/lpmwfx/Rules.git"
-CACHE_DIR = Path.home() / ".cache" / "rules-mcp" / "Rules"
+CACHE_DIR = Path(user_cache_dir("rules-mcp")) / "Rules"
 
 
 def ensure_repo() -> Path:
