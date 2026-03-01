@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from pathlib import Path
 
 from fastmcp import FastMCP
@@ -14,14 +15,18 @@ mcp = FastMCP(
 
 _registry = Registry()
 _repo_path: Path | None = None
+_last_pull: float = 0.0
+_PULL_TTL = 3600.0  # re-pull at most once per hour
 
 
 def _ensure_loaded() -> Path:
-    """Ensure repo is cloned and registry is loaded."""
-    global _repo_path
-    if _repo_path is None:
+    """Ensure repo is cloned and registry is loaded. Re-pulls at most once per hour."""
+    global _repo_path, _last_pull
+    now = time.monotonic()
+    if _repo_path is None or (now - _last_pull) > _PULL_TTL:
         _repo_path = ensure_repo()
         _registry.load(_repo_path)
+        _last_pull = now
     return _repo_path
 
 
