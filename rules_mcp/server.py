@@ -61,7 +61,8 @@ def help() -> str:
 
 ## Quick start
 
-- **New project setup** → `get_context(["project-files"])`
+- **App architecture / folder layout** → `get_context(["global"])`
+- **New project setup** → `get_context(["global", "project-files"])`
 - **Learn a language's rules** → `get_learning_path(["python"], phase=1)`
 - **Search a topic** → `search_rules("error handling")`
 - **Browse everything** → `list_rules()`
