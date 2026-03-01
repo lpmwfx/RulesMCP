@@ -1,0 +1,14 @@
+LICENSE
+README.md
+pyproject.toml
+rules_mcp/__init__.py
+rules_mcp/__main__.py
+rules_mcp/registry.py
+rules_mcp/repo.py
+rules_mcp/server.py
+rules_mcp.egg-info/PKG-INFO
+rules_mcp.egg-info/SOURCES.txt
+rules_mcp.egg-info/dependency_links.txt
+rules_mcp.egg-info/entry_points.txt
+rules_mcp.egg-info/requires.txt
+rules_mcp.egg-info/top_level.txt

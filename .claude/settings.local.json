@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pipx:*)",
+      "Bash(claude:*)",
+      "Bash(pip install:*)",
+      "Bash(python:*)",
+      "Bash(rules-mcp.exe:*)",
+      "mcp__rules__help",
+      "Bash(\"$HOME/pipx/venvs/rules-mcp/Scripts/pip\" install:*)",
+      "Bash(\"C:/Users/mathi/pipx/venvs/rules-mcp/Scripts/python.exe\":*)",
+      "mcp__rules__get_context"
+    ]
+  }
+}

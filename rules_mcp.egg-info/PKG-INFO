@@ -1,0 +1,49 @@
+Metadata-Version: 2.4
+Name: rules-mcp
+Version: 0.1.0
+Summary: MCP server for AI coding rules — Python, JS, CSS, C++, Rust, Kotlin standards
+Author: lpmwfx
+License-Expression: EUPL-1.2
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: fastmcp>=2.0.0
+Requires-Dist: gitpython>=3.1.0
+Requires-Dist: platformdirs>=3.0.0
+Dynamic: license-file
+
+# Rules MCP Server
+
+MCP server for AI coding rules — Python, JS, CSS, C++, Rust, Kotlin standards.
+
+Serves the [Rules](https://github.com/lpmwfx/Rules) repository via Model Context Protocol.
+
+## Install
+
+```bash
+pipx install git+https://github.com/lpmwfx/RulesMCP.git
+```
+
+## Register with Claude Code
+
+```bash
+claude mcp add -s user rules -- rules-mcp
+```
+
+## Tools
+
+| Tool | Description |
+|------|-------------|
+| `search_rules` | Search rules by keyword (tags, concepts, keywords, title) |
+| `get_rule` | Get full markdown content of a specific rule file |
+| `get_context` | Get combined rules for given languages and topics |
+| `get_learning_path` | Get rules in implementation order (phased) |
+| `list_rules` | List available rule files by category |
+
+## Categories
+
+`global`, `project-files`, `automation`, `devops`, `ipc`, `platform-ux`, `python`, `js`, `css`, `cpp`, `rust`, `kotlin`
+
+## License
+
+EUPL-1.2
