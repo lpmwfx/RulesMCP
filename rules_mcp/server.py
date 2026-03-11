@@ -63,9 +63,17 @@ def help() -> str:
 
 - **App architecture / folder layout** → `get_context(["global"])`
 - **New project setup** → `get_context(["global", "project-files"])`
+- **UI/UX rules (components, state flow, platform)** → `get_context(["uiux"])`
 - **Learn a language's rules** → `get_learning_path(["python"], phase=1)`
 - **Search a topic** → `search_rules("error handling")`
+- **File size limits** → `get_rule("global/file-limits.md")`
 - **Browse everything** → `list_rules()`
+
+## Before writing code
+
+1. Check file sizes: `search_rules("file limits")` → split any file at its limit before adding
+2. Read project rules: `get_context(["global"])` → architecture + file-size + layer rules
+3. For UI/CSS work: `get_context(["uiux"])` → component structure + platform behaviour
 
 ## Categories
 
@@ -80,7 +88,7 @@ def search_rules(
 
     Args:
         query: Search terms (e.g. "ownership threading types")
-        category: Filter by category (python, js, css, cpp, rust, kotlin, global, project-files, automation, devops, ipc, platform-ux)
+        category: Filter by category (python, js, css, cpp, rust, kotlin, global, project-files, automation, devops, ipc, uiux)
         limit: Max results (default 10)
     """
     _ensure_loaded()
@@ -255,7 +263,7 @@ def list_rules(category: str | None = None) -> str:
     """List available rule files, optionally filtered by category.
 
     Args:
-        category: Filter by category (python, js, css, cpp, rust, kotlin, global, project-files, automation, devops, ipc, platform-ux). Omit for all.
+        category: Filter by category (python, js, css, cpp, rust, kotlin, global, project-files, automation, devops, ipc, uiux). Omit for all.
     """
     _ensure_loaded()
 

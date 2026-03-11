@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from pathlib import Path
 
 from fastmcp import FastMCP
@@ -14,14 +15,18 @@ mcp = FastMCP(
 
 _registry = Registry()
 _repo_path: Path | None = None
+_last_pull: float = 0.0
+_PULL_TTL = 3600.0  # re-pull at most once per hour
 
 
 def _ensure_loaded() -> Path:
-    """Ensure repo is cloned and registry is loaded."""
-    global _repo_path
-    if _repo_path is None:
+    """Ensure repo is cloned and registry is loaded. Re-pulls at most once per hour."""
+    global _repo_path, _last_pull
+    now = time.monotonic()
+    if _repo_path is None or (now - _last_pull) > _PULL_TTL:
         _repo_path = ensure_repo()
         _registry.load(_repo_path)
+        _last_pull = now
     return _repo_path
 
 
@@ -56,10 +61,19 @@ def help() -> str:
 
 ## Quick start
 
-- **New project setup** → `get_context(["project-files"])`
+- **App architecture / folder layout** → `get_context(["global"])`
+- **New project setup** → `get_context(["global", "project-files"])`
+- **UI/UX rules (components, state flow, platform)** → `get_context(["uiux"])`
 - **Learn a language's rules** → `get_learning_path(["python"], phase=1)`
 - **Search a topic** → `search_rules("error handling")`
+- **File size limits** → `get_rule("global/file-limits.md")`
 - **Browse everything** → `list_rules()`
+
+## Before writing code
+
+1. Check file sizes: `search_rules("file limits")` → split any file at its limit before adding
+2. Read project rules: `get_context(["global"])` → architecture + file-size + layer rules
+3. For UI/CSS work: `get_context(["uiux"])` → component structure + platform behaviour
 
 ## Categories
 
@@ -74,7 +88,7 @@ def search_rules(
 
     Args:
         query: Search terms (e.g. "ownership threading types")
-        category: Filter by category (python, js, css, cpp, rust, kotlin, global, project-files, automation, devops, ipc, platform-ux)
+        category: Filter by category (python, js, css, cpp, rust, kotlin, global, project-files, automation, devops, ipc, uiux)
         limit: Max results (default 10)
     """
     _ensure_loaded()
@@ -249,7 +263,7 @@ def list_rules(category: str | None = None) -> str:
     """List available rule files, optionally filtered by category.
 
     Args:
-        category: Filter by category (python, js, css, cpp, rust, kotlin, global, project-files, automation, devops, ipc, platform-ux). Omit for all.
+        category: Filter by category (python, js, css, cpp, rust, kotlin, global, project-files, automation, devops, ipc, uiux). Omit for all.
     """
     _ensure_loaded()
 

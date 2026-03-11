@@ -75,7 +75,8 @@ class Registry:
         """
         lang_set = {lang.lower() for lang in languages}
         # Always include global + project-files as foundation
-        include_cats = lang_set | {"global", "project-files"}
+        # gateway, adapter, core, pal are architecture categories relevant to all apps
+        include_cats = lang_set | {"global", "project-files", "gateway", "adapter", "core", "pal"}
 
         # Collect relevant entries
         relevant: list[dict] = []
