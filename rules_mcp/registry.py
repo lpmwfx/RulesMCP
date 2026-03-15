@@ -118,6 +118,9 @@ def _score_entry(entry: dict, tokens: list[str]) -> int:
         for field_text, weight in fields:
             if _matches(token, field_text):
                 score += weight
+    # Binding files (axiomatic rules) always rank higher when relevant
+    if score > 0 and entry.get("binding"):
+        score += 10
     return score
 
 
@@ -139,6 +142,9 @@ def _build_weighted_fields(entry: dict) -> list[tuple[str, int]]:
     # Keywords (weight 1 each)
     for kw in entry.get("keywords", []):
         fields.append((kw.lower(), 1))
+    # Axioms (weight 2 each) — non-negotiable constraints surface in searches
+    for axiom in entry.get("axioms", []):
+        fields.append((axiom.lower(), 2))
     # Category (weight 1)
     fields.append((entry.get("category", "").lower(), 1))
     return fields
