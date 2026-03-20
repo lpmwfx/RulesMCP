@@ -33,3 +33,12 @@ claude mcp add -s user rules -- rules-mcp
 ## License
 
 EUPL-1.2
+
+
+---
+
+<!-- LARS:START -->
+<a href="https://lpmathiasen.com">
+  <img src="https://carousel.lpmathiasen.com/carousel.svg?slot=3" alt="Lars P. Mathiasen"/>
+</a>
+<!-- LARS:END -->
