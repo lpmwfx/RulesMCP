@@ -58,3 +58,12 @@ before reading project files or forming a plan.
 
 - Rule content sourced from: `github.com/lpmwfx/Rules`
 - Scanner enforcement via: `github.com/lpmwfx/RulesTools` + `github.com/lpmwfx/RulesToolsMCP`
+
+
+---
+
+<!-- LARS:START -->
+<a href="https://lpmathiasen.com">
+  <img src="https://carousel.lpmathiasen.com/carousel.svg?slot=3" alt="Lars P. Mathiasen"/>
+</a>
+<!-- LARS:END -->
